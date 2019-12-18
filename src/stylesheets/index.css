@@ -12,3 +12,18 @@ h1 {
     text-align: center;
 }
 
+.filter-title {
+    color: #ef5b13;
+    font-size: x-large;
+    display: inline-block;
+    margin-right: 15px;
+}
+
+.message {
+    display: flex;
+    justify-content: center;
+    font-size: xx-large;
+    color: #acacac;
+}
+
+
