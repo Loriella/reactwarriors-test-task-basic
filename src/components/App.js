@@ -8,7 +8,12 @@ export class App extends React.Component {
     this.state = {
       loading: false,
       galleryItems: [],
+      refreshButton: false,
     }
+  }
+
+  componentDidMount() {
+    this.getGalleryData();
   }
 
   getGalleryData = () => {
@@ -22,22 +27,46 @@ export class App extends React.Component {
       .then(response => response.json())
       .then(({data}) => {
         this.setState({
-          galleryItems: data.children,
+          galleryItems: data.children.sort(function (a, b) {
+              if (a.data.num_comments < b.data.num_comments) {
+                return 1;
+              }
+              if (a.data.num_comments > b.data.num_comments) {
+                return -1;
+              }
+              return 0;
+            }),
           loading: false
         })
       })
   };
 
-  componentDidMount() {
-    this.getGalleryData();
-  }
+  autoRefreshHandle = () => {
+    this.setState(state => ({
+        refreshButton: !state.refreshButton
+      }), () => {
+        if (this.state.refreshButton) {
+          this.timerId = setInterval(this.getGalleryData, 3000);
+        } else {
+          clearInterval(this.timerId);
+        }
+      }
+    );
+  };
 
   render() {
-    const {galleryItems} = this.state;
+    const {galleryItems, refreshButton} = this.state;
 
     return (
       <div className="container">
         <h1>Top commented.</h1>
+        <button
+          className="refresh-btn"
+          type="button"
+          onClick={this.autoRefreshHandle}
+        >
+          {refreshButton ? "Stop auto-refresh" : "Start auto-refresh"}
+        </button>
         {
           this.state.loading
             ? <div className="loader">Loading...</div>
@@ -54,7 +83,7 @@ export class App extends React.Component {
                   </div>
                 )
               })
-              }}
+              }
             </div>
         }
       </div>
