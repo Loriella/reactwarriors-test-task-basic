@@ -27,7 +27,8 @@ class RangeInput extends React.Component {
             className="form-control-range"
             id="formControlRange"
             min="0"
-            max="1540"
+            max="500"
+            value={this.props.rangeFilter}
             onChange={this.onChange}
           />
         </div>

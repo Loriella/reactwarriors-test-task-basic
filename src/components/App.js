@@ -1,5 +1,5 @@
 import React from "react";
-import GalleryItem from "./GalleryItem";
+import {GalleryItem} from "./GalleryItem";
 import RangeInput from "./RangeInput";
 
 export class App extends React.Component {
@@ -29,15 +29,7 @@ export class App extends React.Component {
       .then(response => response.json())
       .then(({data}) => {
         this.setState({
-          galleryItems: data.children.sort(function (a, b) {
-            if (a.data.num_comments < b.data.num_comments) {
-              return 1;
-            }
-            if (a.data.num_comments > b.data.num_comments) {
-              return -1;
-            }
-            return 0;
-          }),
+          galleryItems: data.children,
           loading: false
         })
       })
@@ -62,9 +54,14 @@ export class App extends React.Component {
     })
   };
 
+  getItemsByComments = (items, rangeFilter) =>
+    items
+      .filter(item => item.data.num_comments >= Number(rangeFilter))
+      .sort((a, b) => b.data.num_comments - a.data.num_comments);
+
   render() {
     const {galleryItems, refreshButton, rangeFilter} = this.state;
-    const filteredGalleryItems = galleryItems.filter(item => item.data.num_comments >= Number(rangeFilter));
+    const SortGalleryItems = this.getItemsByComments(galleryItems, rangeFilter);
 
     return (
       <div className="container">
@@ -78,15 +75,16 @@ export class App extends React.Component {
           {refreshButton ? "Stop auto-refresh" : "Start auto-refresh"}
         </button>
         <RangeInput
+          rangeFilter={rangeFilter}
           onChangeRangeFilter={this.onChangeRangeFilter}
         />
         {
           this.state.loading
             ? <div className="loader">Loading...</div>
             : <div className="row mt-4">
-              { filteredGalleryItems.length === 0
+              { SortGalleryItems.length === 0
                 ? <div className="message">No results found matching your criteria</div>
-                : filteredGalleryItems.map(item => {
+                : SortGalleryItems.map(item => {
                   return (
                     <div
                       className="col-4"
